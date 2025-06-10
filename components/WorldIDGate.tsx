@@ -2,7 +2,7 @@ import { useState } from "react";
 import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 
 interface WorldIDGateProps {
-  onSuccess: (verification: ISuccessResult, isOrb: boolean) => void;
+  onSuccess: (verification: any, isOrb: boolean) => void;
 }
 
 export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
@@ -18,12 +18,10 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
         <p className="mb-4 text-center">
           Silakan login dengan <b>World ID</b> untuk melanjutkan.
         </p>
-        <IDKitWidget
-          app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-          action="log-in"
-          signal=""
-          onSuccess={(result: ISuccessResult) => {
+        <WorldIDLoginButton
+          onSuccess={(result) => {
             setLoading(true);
+            // Atur isOrb sesuai logic kamu, misal cek result.verification_level === "orb"
             onSuccess(result, result.verification_level === "orb");
           }}
         >
