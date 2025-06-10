@@ -5,7 +5,8 @@ export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: 
   const handleLogin = async () => {
     try {
       const mk = new MiniKit();
-      const result = await mk.requestWorldID();
+      // Kirim command 'world_id' ke World App
+      const result = await mk.send("world_id");
       if (result) {
         onSuccess(result);
       }
