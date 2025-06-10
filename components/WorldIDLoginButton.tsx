@@ -1,24 +1,16 @@
-import React from "react";
-
-declare global {
-  interface Window {
-    worldApp?: {
-      request: (action: string) => Promise<any>;
-    };
-  }
-}
+"use client";
+import { MiniKit } from "@worldcoin/minikit-js";
 
 export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
-    if (typeof window !== "undefined" && window.worldApp && typeof window.worldApp.request === "function") {
-      try {
-        const result = await window.worldApp.request("world_id");
+    try {
+      const mk = new MiniKit();
+      const result = await mk.requestWorldID();
+      if (result) {
         onSuccess(result);
-      } catch (err) {
-        alert("Login dibatalkan");
       }
-    } else {
-      alert("World App SDK tidak ditemukan. Coba buka lewat World App.");
+    } catch (e) {
+      alert("Login dibatalkan atau gagal.");
     }
   };
 
