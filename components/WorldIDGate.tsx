@@ -20,7 +20,7 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
         </p>
         <IDKitWidget
           app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-          action="login"
+          action="log-in"
           signal=""
           onSuccess={(result: ISuccessResult) => {
             setLoading(true);
