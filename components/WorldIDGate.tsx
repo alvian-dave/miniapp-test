@@ -19,13 +19,10 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
           Silakan login dengan <b>World ID</b> untuk melanjutkan.
         </p>
         <WorldIDLoginButton
-          onSuccess={(result) => {
-            setLoading(true);
-            // Atur isOrb sesuai logic kamu, misal cek result.verification_level === "orb"
-            onSuccess(result, result.verification_level === "orb");
-          }}
-        >
-          {({ open }: { open: () => void }) => ( // <--- tambahkan tipe di sini
+  onSuccess={(result) => {
+    setLoading(true);
+    onSuccess(result, result.verification_level === "orb");
+  }}
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
               onClick={open}
@@ -34,7 +31,6 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
               {loading ? "Memproses..." : "Login dengan World ID"}
             </button>
           )}
-        </IDKitWidget>
       </div>
     </div>
   );
