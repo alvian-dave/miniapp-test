@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 import Dashboard from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

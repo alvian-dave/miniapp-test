@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 
 interface WorldIDGateProps {
   onSuccess: (verification: ISuccessResult, isOrb: boolean) => void;
