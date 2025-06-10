@@ -24,13 +24,10 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
           signal=""
           onSuccess={(result: ISuccessResult) => {
             setLoading(true);
-            // GANTI INI:
-            // onSuccess(result, result.verification_level === "orb")
-            // JADI:
             onSuccess(result, result.verification_level === "orb");
           }}
         >
-          {({ open }) => (
+          {({ open }: { open: () => void }) => ( // <--- tambahkan tipe di sini
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
               onClick={open}
