@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+interface DashboardProps {
+  nullifierHash: string;
+}
+
+export default function Dashboard({ nullifierHash }: DashboardProps) {
+  // ... kode dashboard kamu di sini
+}
+
 export default function Dashboard({ nullifierHash }) {
   const [claimable, setClaimable] = useState(0);
   const [balance, setBalance] = useState(0);
