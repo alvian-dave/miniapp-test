@@ -20,13 +20,10 @@ export default function Home() {
           <p className="text-center text-gray-600 mb-5 text-sm">
             Hubungkan World ID kamu untuk masuk ke dashboard MiniApp.
           </p>
-          <IDKitWidget
-            app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-            action="log-in"
-            signal=""
-            onSuccess={(result: ISuccessResult) => setNullifierHash(result.nullifier_hash)}
-          >
-            {({ open }: { open: () => void }) => (
+          <WorldIDLoginButton
+          onSuccess={(result) => {
+            setLoading(true);
+            onSuccess(result, result.verification_level === "orb");
               <Button
                 className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
                 onClick={open}
@@ -34,7 +31,7 @@ export default function Home() {
                 Connect with World ID
               </Button>
             )}
-          </IDKitWidget>
+          />
         </CardContent>
       </Card>
       <div className="text-xs text-gray-400 mt-8">© {new Date().getFullYear()} World Reward Coin</div>
