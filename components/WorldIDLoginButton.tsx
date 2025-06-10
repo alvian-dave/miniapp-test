@@ -1,22 +1,25 @@
 import React from "react";
 
-export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
+export default function WorldIDLoginButton({ onSuccess }) {
   const handleLogin = async () => {
-    if (typeof window !== "undefined" && (window as any).worldApp) {
+    if (typeof window !== "undefined" && window.worldApp && typeof window.worldApp.request === "function") {
       try {
-        const result = await (window as any).worldApp.request("world_id");
+        const result = await window.worldApp.request("world_id");
         onSuccess(result);
       } catch (err) {
-        alert("User cancelled or error: " + (err as Error).message);
+        // Handle jika user batal/cancel
+        alert("Login dibatalkan");
       }
     } else {
-      // Fallback jika bukan di World App: redirect ke QR scan (sesuaikan/fallback lain jika perlu)
-      window.location.href = "https://id.worldcoin.org/verify";
+      alert("World App SDK tidak ditemukan. Coba buka lewat World App.");
     }
   };
 
   return (
-    <button className="px-4 py-2 font-bold rounded bg-black text-white" onClick={handleLogin}>
+    <button
+      className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
+      onClick={handleLogin}
+    >
       Connect with World ID
     </button>
   );
