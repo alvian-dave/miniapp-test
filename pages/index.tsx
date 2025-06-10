@@ -28,12 +28,12 @@ export default function Home() {
           onSuccess={(result: ISuccessResult) => setNullifierHash(result.nullifier_hash)}
         >
           {({ open }: { open: () => void }) => (
-            <button
+            <Button
               className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
               onClick={open}
             >
               Connect with World ID
-            </button>
+            </Button>
           )}
         </IDKitWidget>
       </div>

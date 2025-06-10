@@ -85,12 +85,12 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
             <p className="text-base sm:text-lg flex items-center gap-2">
               🎁 Klaim Tersedia: <span className="font-mono text-green-600">{claimable.toFixed(6)}</span> WRC
             </p>
-            <button
+            <Button
               className="w-full bg-teal-500 hover:bg-teal-600 text-white text-sm sm:text-base rounded-lg py-2 mt-2 font-bold"
               onClick={claim}
             >
               Claim Sekarang
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -110,20 +110,20 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
                 value={stakeInput}
                 onChange={handleStakeInputChange}
               />
-              <button
+              <Button
                 className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg px-4 py-2 font-bold"
                 onClick={stake}
                 disabled={loadingStake}
               >
                 {loadingStake ? 'Loading...' : 'Stake'}
-              </button>
+              </Button>
             </div>
-            <button
+            <Button
               className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 font-bold"
               onClick={unstake}
             >
               Tarik Semua
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -137,18 +137,18 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               💹 Reward Sekarang: <span className="font-mono text-yellow-600">{reward.toFixed(6)}</span> WRC
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <button
+              <Button
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 font-bold"
                 onClick={compound}
               >
                 Compound Reward
-              </button>
-              <button
+              </Button>
+              <Button
                 className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 font-bold"
                 onClick={claimReward}
               >
                 Claim Reward
-              </button>
+              </Button>
             </div>
           </div>
         </div>
