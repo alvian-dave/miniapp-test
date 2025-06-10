@@ -191,7 +191,7 @@ export default function HomePage() {
               signal=""
               onSuccess={handleWorldIdSuccess}
             >
-              {({ open }) => (
+              {({ open }: { open: () => void }) => (
                 <button
                   className="bg-black text-white px-6 py-2 rounded-lg font-bold shadow active:scale-95 transition"
                   onClick={open}
