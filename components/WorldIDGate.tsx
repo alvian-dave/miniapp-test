@@ -23,8 +23,11 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
           action="login"
           signal=""
           onSuccess={(result: ISuccessResult) => {
-            setLoading(true)
-            onSuccess(result, result.credential_type === "orb")
+            setLoading(true);
+            // GANTI INI:
+            // onSuccess(result, result.verification_level === "orb")
+            // JADI:
+            onSuccess(result, result.verification_level === "orb");
           }}
         >
           {({ open }) => (
