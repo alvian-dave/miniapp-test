@@ -1,13 +1,20 @@
 import React from "react";
 
-export default function WorldIDLoginButton({ onSuccess }) {
+declare global {
+  interface Window {
+    worldApp?: {
+      request: (action: string) => Promise<any>;
+    };
+  }
+}
+
+export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
     if (typeof window !== "undefined" && window.worldApp && typeof window.worldApp.request === "function") {
       try {
         const result = await window.worldApp.request("world_id");
         onSuccess(result);
       } catch (err) {
-        // Handle jika user batal/cancel
         alert("Login dibatalkan");
       }
     } else {
