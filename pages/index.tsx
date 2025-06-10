@@ -1,18 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+
+// Icon helper
+const Icon = ({ children }: { children: React.ReactNode }) => (
+  <span className="inline-block align-middle mr-1">{children}</span>
+);
 
 const APY = 0.7; // 70% per tahun
 
 export default function HomePage() {
   // State utama
-  const [wallet, setWallet] = useState(10_000);
-  const [claimable, setClaimable] = useState(100);
+  const [wallet, setWallet] = useState(0);
+  const [claimable, setClaimable] = useState(0);
   const [staking, setStaking] = useState(0);
   const [inputStake, setInputStake] = useState("");
   const [reward, setReward] = useState(0);
   const [lastRewardUpdate, setLastRewardUpdate] = useState(Date.now());
   const [isVerified, setIsVerified] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   // Timer untuk update reward
   useEffect(() => {
@@ -20,7 +24,6 @@ export default function HomePage() {
       const interval = setInterval(() => {
         const now = Date.now();
         const elapsedSec = (now - lastRewardUpdate) / 1000;
-        // APY = 70% setahun, per detik: APY/365/24/3600
         const perSecondRate = APY / 365 / 24 / 3600;
         setReward((r) => r + staking * perSecondRate * elapsedSec);
         setLastRewardUpdate(now);
@@ -32,10 +35,10 @@ export default function HomePage() {
   }, [staking, lastRewardUpdate]);
 
   // Handler World ID success
-  function handleWorldIdSuccess(result: ISuccessResult) {
+  function handleWorldIdSuccess(_result: ISuccessResult) {
     setIsVerified(true);
-    // Rate claimable bisa disesuaikan jika ingin berbeda untuk orb/non-orb
-    setClaimable(isVerified ? 200 : 100);
+    setWallet(0);
+    setClaimable(100); // atau sesuai logika klaim
   }
 
   // Handler claim
@@ -63,7 +66,7 @@ export default function HomePage() {
 
   // Max button
   function handleMax() {
-    setInputStake(wallet.toFixed(5));
+    setInputStake(wallet.toFixed(6));
   }
 
   // Compound reward
@@ -80,136 +83,150 @@ export default function HomePage() {
     setLastRewardUpdate(Date.now());
   }
 
-  return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-700 flex flex-col items-center px-2 py-4">
-      {/* Card utama */}
-      <div className="w-full max-w-sm bg-white/80 rounded-2xl shadow-lg p-4 mt-4 space-y-4">
-        {/* Header */}
-        <div className="flex flex-col items-center">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-14 w-14 flex items-center justify-center shadow">
-            <span className="text-3xl">🌐</span>
-          </div>
-          <span className="font-bold text-xl mt-2 text-gray-800">World Reward Coin</span>
-          <span className="text-xs text-gray-500">WRC Mini App</span>
-        </div>
+  // Format angka
+  function fmt(num: number) {
+    return num.toLocaleString("en-US", { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+  }
 
-        {/* Wallet & Claim */}
-        <div className="flex flex-col bg-slate-100 rounded-xl p-4 space-y-2 shadow">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-gray-700">Saldo Wallet</span>
-            <span className="font-mono text-lg font-bold text-indigo-700">{wallet.toFixed(5)} WRC</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-gray-700">Klaim Tersedia</span>
-            <span className="font-mono text-lg font-bold text-green-600">{claimable.toFixed(5)} WRC</span>
-          </div>
-          <button
-            className="w-full mt-2 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white font-bold rounded-lg shadow-lg active:scale-95 transition"
-            onClick={handleClaim}
-            disabled={claimable < 0.00001}
+  // ================= LOGIN PAGE ========================
+  if (!isVerified) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-cyan-200 via-blue-100 to-indigo-200 px-2">
+        <div className="bg-white rounded-2xl shadow-xl p-7 max-w-xs w-full flex flex-col items-center">
+          <span className="text-5xl mb-3">🌐</span>
+          <h1 className="font-bold text-2xl text-center mb-2 text-gray-800">World Reward Coin</h1>
+          <p className="text-center text-gray-600 mb-5 text-sm">Login terlebih dahulu menggunakan World ID untuk masuk ke dashboard miniapp.</p>
+          <IDKitWidget
+            app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
+            action="log-in"
+            signal=""
+            onSuccess={handleWorldIdSuccess}
           >
-            Claim
-          </button>
-        </div>
-
-        {/* Staking */}
-        <div className="bg-slate-100 rounded-xl p-4 shadow space-y-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold text-gray-700">Total Staking</span>
-            <div className="flex items-center space-x-2">
-              <span className="font-mono text-lg font-bold text-blue-600">{staking.toFixed(5)} WRC</span>
+            {({ open }: { open: () => void }) => (
               <button
-                className="px-2 py-0.5 bg-indigo-200 rounded text-xs font-bold text-indigo-800 hover:bg-indigo-300"
-                onClick={handleMax}
-                title="Stake Maksimal"
+                className="w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg shadow hover:from-blue-600 hover:to-blue-400 transition text-lg"
+                onClick={open}
               >
-                Max
+                Login dengan World ID
               </button>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              min="0"
-              max={wallet}
-              value={inputStake}
-              onChange={(e) => setInputStake(e.target.value)}
-              placeholder="Jumlah staking"
-              className="flex-1 rounded-lg border px-2 py-2 font-mono text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg active:scale-95 transition"
-              onClick={handleStake}
-              disabled={!inputStake || parseFloat(inputStake) <= 0 || parseFloat(inputStake) > wallet}
-            >
-              Stake
-            </button>
-          </div>
+            )}
+          </IDKitWidget>
+        </div>
+        <div className="text-xs text-gray-400 mt-8">© {new Date().getFullYear()} World Reward Coin</div>
+      </div>
+    );
+  }
+
+  // ================= DASHBOARD PAGE ========================
+  return (
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-cyan-200 via-blue-100 to-indigo-200 py-6 px-2">
+      <div className="flex flex-col items-center mb-5">
+        <span className="text-4xl">🌐</span>
+        <span className="font-bold text-3xl mt-2 text-gray-800 tracking-tight">World Reward Coin</span>
+      </div>
+
+      {/* CLAIM CARD */}
+      <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md mb-5 border-t-4 border-green-400">
+        <div className="flex items-center mb-2">
+          <Icon>🪪</Icon>
+          <span className="font-bold text-lg text-green-700">CLAIM</span>
+        </div>
+        <div className="flex items-center mb-1">
+          <Icon>👛</Icon>
+          <span className="font-semibold text-gray-800">Saldo Wallet:</span>
+          <span className="font-mono ml-2 text-base text-gray-800">{fmt(wallet)} WRC</span>
+        </div>
+        <div className="flex items-center mb-3">
+          <Icon>🎁</Icon>
+          <span className="font-semibold text-gray-800">Klaim Tersedia:</span>
+          <span className="font-mono ml-2 text-base text-green-600">{fmt(claimable)} WRC</span>
+        </div>
+        <button
+          className="w-full py-2 mt-2 bg-emerald-500 text-white font-bold rounded shadow hover:bg-emerald-600 transition"
+          onClick={handleClaim}
+          disabled={claimable < 0.000001}
+        >
+          Claim Sekarang
+        </button>
+      </div>
+
+      {/* STAKING CARD */}
+      <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md mb-5 border-t-4 border-yellow-400">
+        <div className="flex items-center mb-2">
+          <Icon>💰</Icon>
+          <span className="font-bold text-lg text-yellow-700">STAKING</span>
+        </div>
+        <div className="flex items-center mb-2">
+          <Icon>🧪</Icon>
+          <span className="font-semibold text-gray-800">Total Staking:</span>
+          <span className="font-mono ml-2 text-base text-gray-800">{fmt(staking)} WRC</span>
           <button
-            className="w-full mt-2 py-2 bg-gradient-to-r from-pink-400 to-red-500 text-white font-bold rounded-lg shadow-md active:scale-95 transition"
-            onClick={handleUnstakeAll}
-            disabled={staking <= 0}
+            className="ml-2 text-xs px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded"
+            onClick={handleMax}
+            title="Stake Maksimal"
           >
-            Tarik Semua
+            Max
           </button>
         </div>
-
-        {/* Reward */}
-        <div className="bg-slate-100 rounded-xl p-4 shadow space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-gray-700">Reward</span>
-            <span className="font-mono text-lg font-bold text-amber-600">{reward.toFixed(5)} WRC</span>
-          </div>
-          <div className="flex space-x-2 mt-2">
-            <button
-              className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 rounded-lg active:scale-95 transition"
-              onClick={handleCompound}
-              disabled={reward < 0.00001}
-            >
-              ⭐ Compound Reward
-            </button>
-            <button
-              className="flex-1 bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg active:scale-95 transition"
-              onClick={handleClaimReward}
-              disabled={reward < 0.00001}
-            >
-              ⬇️ Claim Reward
-            </button>
-          </div>
-          <div className="text-xs text-gray-400 mt-1 text-center">APY 70% • Reward berjalan jika ada staking</div>
+        <div className="flex items-center mb-2">
+          <input
+            type="number"
+            min="0"
+            max={wallet}
+            value={inputStake}
+            onChange={(e) => setInputStake(e.target.value)}
+            placeholder="Jumlah yang ingin di-stake"
+            className="flex-1 rounded border px-3 py-2 text-base mr-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+          />
+          <button
+            className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-5 py-2 rounded transition"
+            onClick={handleStake}
+            disabled={!inputStake || parseFloat(inputStake) <= 0 || parseFloat(inputStake) > wallet}
+          >
+            Stake
+          </button>
         </div>
-
-        {/* World ID Gate */}
-        <div className="bg-slate-50 rounded-xl p-4 shadow flex flex-col items-center space-y-2">
-          <span className="font-semibold text-gray-700">Verifikasi World ID</span>
-          {isVerified ? (
-            <span className="px-4 py-1 bg-green-200 text-green-700 rounded-lg font-bold">Terverifikasi</span>
-          ) : (
-            <IDKitWidget
-              app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-              action="log-in"
-              signal=""
-              onSuccess={handleWorldIdSuccess}
-            >
-              {({ open }: { open: () => void }) => (
-                <button
-                  className="bg-black text-white px-6 py-2 rounded-lg font-bold shadow active:scale-95 transition"
-                  onClick={open}
-                  disabled={loading}
-                >
-                  {loading ? "Memproses..." : "Login dengan World ID"}
-                </button>
-              )}
-            </IDKitWidget>
-          )}
-        </div>
+        <button
+          className="w-full py-2 mt-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded shadow transition"
+          onClick={handleUnstakeAll}
+          disabled={staking <= 0}
+        >
+          Tarik Semua
+        </button>
       </div>
 
-      <div className="text-xs text-slate-200 mt-6 opacity-50 text-center max-w-xs">
-        © {new Date().getFullYear()} World Reward Coin Mini App.  
-        <br />
-        UI mobile & modern — Powered by TailwindCSS.
+      {/* REWARD CARD */}
+      <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md mb-5 border-t-4 border-purple-400">
+        <div className="flex items-center mb-2">
+          <Icon>🎉</Icon>
+          <span className="font-bold text-lg text-purple-700">REWARD</span>
+        </div>
+        <div className="flex items-center mb-2">
+          <Icon>✅</Icon>
+          <span className="font-semibold text-gray-800">Reward Sekarang:</span>
+          <span className="font-mono ml-2 text-base text-purple-700">{fmt(reward)} WRC</span>
+        </div>
+        <div className="flex space-x-2 mt-3">
+          <button
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded transition"
+            onClick={handleCompound}
+            disabled={reward < 0.000001}
+          >
+            Compound Reward
+          </button>
+          <button
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition"
+            onClick={handleClaimReward}
+            disabled={reward < 0.000001}
+          >
+            Claim Reward
+          </button>
+        </div>
+        <div className="text-xs text-gray-400 mt-2 text-center">
+          Reward berjalan otomatis sesuai APY 70% jika ada staking aktif.
+        </div>
       </div>
+      <div className="text-xs text-gray-400 mt-6 mb-2">© {new Date().getFullYear()} World Reward Coin</div>
     </div>
   );
 }
