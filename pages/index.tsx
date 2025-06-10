@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
-import Dashboard from '@/components/Dashboard';
+import Dashboard from '../components/Dashboard';
 
 export default function Home() {
   const [nullifierHash, setNullifierHash] = useState<string | null>(null);
