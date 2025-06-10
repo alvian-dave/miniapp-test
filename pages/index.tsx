@@ -1,8 +1,7 @@
 import { useState } from "react";
-import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 import Dashboard from "@/components/Dashboard";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 
 export default function Home() {
   const [nullifierHash, setNullifierHash] = useState<string | null>(null);
@@ -21,16 +20,7 @@ export default function Home() {
             Hubungkan World ID kamu untuk masuk ke dashboard MiniApp.
           </p>
           <WorldIDLoginButton
-          onSuccess={(result) => {
-            setLoading(true);
-            onSuccess(result, result.verification_level === "orb");
-              <Button
-                className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
-                onClick={open}
-              >
-                Connect with World ID
-              </Button>
-            )}
+            onSuccess={result => setNullifierHash(result.nullifier_hash)}
           />
         </CardContent>
       </Card>
