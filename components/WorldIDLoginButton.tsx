@@ -4,11 +4,8 @@ import { MiniKit } from "@worldcoin/minikit-js";
 export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
     try {
-      const mk = new MiniKit({
-        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID, // pastikan sudah ada di .env.local
-      });
-      // Gunakan command wallet-auth untuk autentikasi user
-      const result = await mk.command("wallet-auth");
+      const mk = new MiniKit(); // tanpa argumen
+      const result = await mk.command("wallet-auth"); // command sesuai docs terbaru
       if (result) {
         onSuccess(result);
       }
