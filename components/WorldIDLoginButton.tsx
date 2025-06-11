@@ -1,24 +1,18 @@
 "use client";
 import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
-import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
-type WorldIDLoginButtonProps = {
-  onSuccess: (result: ISuccessResult) => void;
-};
-
-export default function WorldIDLoginButton({ onSuccess }: WorldIDLoginButtonProps) {
-  const handleSuccess = useCallback(
-    (result: ISuccessResult) => {
-      onSuccess(result);
-    },
-    [onSuccess]
-  );
+export default function WorldIDLoginButton() {
+  const router = useRouter();
 
   return (
     <IDKitWidget
       app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
       action="log-in"
-      onSuccess={handleSuccess}
+      onSuccess={(result: ISuccessResult) => {
+        // result sudah mengandung nullifier_hash dsb, bisa kamu proses jika perlu
+        router.push("/dashboard"); // Ganti "/dashboard" sesuai halaman utama/dashboard kamu
+      }}
     >
       {({ open }) => (
         <button

@@ -1,15 +1,7 @@
-import { useState } from "react";
-import Dashboard from "@/components/Dashboard";
 import { Card, CardContent } from "@/components/ui/card";
 import WorldIDLoginButton from "@/components/WorldIDLoginButton";
 
 export default function Home() {
-  const [nullifierHash, setNullifierHash] = useState<string | null>(null);
-
-  if (nullifierHash) {
-    return <Dashboard nullifierHash={nullifierHash} />;
-  }
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-cyan-200 via-blue-100 to-indigo-200 px-2">
       <Card className="rounded-2xl shadow-xl p-8 max-w-xs w-full flex flex-col items-center">
@@ -19,9 +11,7 @@ export default function Home() {
           <p className="text-center text-gray-600 mb-5 text-sm">
             Hubungkan World ID kamu untuk masuk ke dashboard MiniApp.
           </p>
-          <WorldIDLoginButton
-            onSuccess={result => setNullifierHash(result.nullifier_hash)}
-          />
+          <WorldIDLoginButton />
         </CardContent>
       </Card>
       <div className="text-xs text-gray-400 mt-8">© {new Date().getFullYear()} World Reward Coin</div>
