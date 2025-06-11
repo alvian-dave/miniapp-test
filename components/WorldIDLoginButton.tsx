@@ -4,11 +4,11 @@ import { MiniKit } from "@worldcoin/minikit-js";
 export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
     try {
-      const mk = new MiniKit({
-        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID!,
+      const mk = new MiniKit();
+      const result = await mk.worldID.connect({
+        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID, // <-- set di sini
         action: "log-in",
       });
-      const result = await mk.worldID.connect();
       if (result) {
         onSuccess(result);
       }
