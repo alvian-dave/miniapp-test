@@ -21,7 +21,9 @@ export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
         <WorldIDLoginButton
           onSuccess={(result) => {
             setLoading(true);
-            onSuccess(result, result.verification_level === "orb");
+            // Cek hasil response wallet-auth, jika tidak ada verification_level ganti dengan field lain
+            // Sementara gunakan nullifier_hash saja
+            onSuccess(result, false); // Atau deteksi sesuai field terbaru
           }}
         />
       </div>

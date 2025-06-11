@@ -5,10 +5,10 @@ export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: 
   const handleLogin = async () => {
     try {
       const mk = new MiniKit({
-        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID, // pastikan env sudah ada!
+        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID, // pastikan sudah ada di .env.local
       });
-      // Ganti 'send' dengan method terbaru, misal 'open'
-      const result = await mk.open(); // atau .connect(), cek docs!
+      // Gunakan command wallet-auth untuk autentikasi user
+      const result = await mk.command("wallet-auth");
       if (result) {
         onSuccess(result);
       }
