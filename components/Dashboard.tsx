@@ -16,27 +16,54 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
   const [stakeInput, setStakeInput] = useState('');
   const [loadingStake, setLoadingStake] = useState(false);
 
+  // Fetch reward berjalan tiap detik
   useEffect(() => {
-  const fetchStatus = () => {
-    axios.get(`/api/claim/status/${nullifierHash}`)
-      .then(res => setClaimable(res.data.claimable));
-  };
-  const interval = setInterval(fetchStatus, 1000);
-  fetchStatus();
-  return () => clearInterval(interval);
-}, [nullifierHash]);
+    const fetchClaimable = () => {
+      axios.get(`/api/claim/status/${nullifierHash}`)
+        .then(res => setClaimable(res.data.claimable));
+    };
+    const interval = setInterval(fetchClaimable, 1000);
+    fetchClaimable();
+    return () => clearInterval(interval);
+  }, [nullifierHash]);
 
+  // Fetch saldo wallet
+  const fetchBalance = async () => {
+    const res = await axios.get(`/api/user/wallet/${nullifierHash}`);
+    setBalance(res.data.balance);
+  };
+
+  // Fetch status staking (stake & reward staking)
+  const fetchStakeStatus = async () => {
+    const res = await axios.get(`/api/stake/status/${nullifierHash}`);
+    setStakeAmount(res.data.stake);
+    setReward(res.data.stakeReward);
+  };
+
+  // Fetch balance & stake status saat mount, dan polling tiap detik
+  useEffect(() => {
+    fetchBalance();
+    fetchStakeStatus();
+    const interval = setInterval(fetchStakeStatus, 1000);
+    return () => clearInterval(interval);
+  }, [nullifierHash]);
+
+  // Handler claim
   const claim = async () => {
     const res = await axios.post('/api/claim/execute', { nullifier_hash: nullifierHash });
     alert(`Claimed ${res.data.claimed} WRC`);
+    fetchBalance();
   };
 
+  // Handler stake
   const stake = async () => {
     setLoadingStake(true);
     try {
-      const res = await axios.post('/api/stake', { nullifier_hash: nullifierHash, amount: parseFloat(stakeInput) });
-      alert(`Staked ${res.data.staked} WRC (compounded ${res.data.compounded})`);
+      const res = await axios.post('/api/stake/execute', { nullifier_hash: nullifierHash, amount: parseFloat(stakeInput) });
+      alert(`Staked ${res.data.stake} WRC`);
       setStakeInput('');
+      fetchBalance();
+      fetchStakeStatus();
     } catch (e) {
       alert('Stake gagal. Pastikan jumlah valid.');
     } finally {
@@ -44,19 +71,32 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
     }
   };
 
+  // Handler unstake
   const unstake = async () => {
-    const res = await axios.post('/api/stake/unstake', { nullifier_hash: nullifierHash });
-    alert(`Unstaked ${res.data.unstaked} WRC`);
+    const res = await axios.post('/api/stake/unstake', { nullifier_hash: nullifierHash, amount: stakeAmount });
+    alert(`Unstaked ${res.data.stake} WRC`);
+    fetchBalance();
+    fetchStakeStatus();
   };
 
+  // Handler compound
   const compound = async () => {
+    // Misal endpoint compound mengkonversi reward staking menjadi stake baru
+    // (implementasikan endpoint /api/stake/compound jika belum ada)
     const res = await axios.post('/api/stake/compound', { nullifier_hash: nullifierHash });
     alert(`Compounded ${res.data.compounded} WRC`);
+    fetchBalance();
+    fetchStakeStatus();
   };
 
+  // Handler claim reward staking
   const claimReward = async () => {
+    // Misal endpoint claim-reward memindahkan reward staking ke wallet user
+    // (implementasikan endpoint /api/stake/claim-reward jika belum ada)
     const res = await axios.post('/api/stake/claim-reward', { nullifier_hash: nullifierHash });
     alert(`Claimed ${res.data.claimed} WRC`);
+    fetchBalance();
+    fetchStakeStatus();
   };
 
   const handleStakeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +159,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
             <Button
               className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 font-bold"
               onClick={unstake}
+              disabled={stakeAmount === 0}
             >
               Tarik Semua
             </Button>
@@ -132,7 +173,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               <span>🎉</span> REWARD
             </h2>
             <p className="text-base sm:text-lg flex items-center gap-2">
-              💹 Reward Sekarang: <span className="font-mono text-yellow-600">{reward.toFixed(6)}</span> WRC
+              💹 Reward Staking: <span className="font-mono text-yellow-600">{reward.toFixed(6)}</span> WRC
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <Button

@@ -28,12 +28,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   let user = users[nullifierHash];
   if (!user) return res.status(404).json({ error: "User not found" });
 
-  // Hitung reward berjalan
+  // Hitung reward staking berjalan
   const now = Date.now();
-  const deltaSec = Math.max(0, Math.floor((now - (user.lastStakeUpdate ?? now)) / 1000));
+  const lastUpdate = user.lastStakeUpdate ?? now;
+  const deltaSec = Math.floor((now - lastUpdate) / 1000);
+
   const apy = 0.7; // 70% per tahun
-  const stakeRewardPerSec = (user.stake ?? 0) * (apy / 365 / 24 / 60 / 60);
-  user.stakeReward = (user.stakeReward ?? 0) + deltaSec * stakeRewardPerSec;
+  const stake = user.stake ?? 0;
+  // Reward per detik: stake * (APY / 365 hari / 24 jam / 60 menit / 60 detik)
+  const rewardPerSecond = stake * (apy / 365 / 24 / 60 / 60);
+
+  user.stakeReward = (user.stakeReward ?? 0) + deltaSec * rewardPerSecond;
   user.lastStakeUpdate = now;
 
   users[nullifierHash] = user;
