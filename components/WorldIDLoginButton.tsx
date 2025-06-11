@@ -4,9 +4,11 @@ import { MiniKit } from "@worldcoin/minikit-js";
 export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
     try {
-      const mk = new MiniKit();
-      // Kirim command 'world_id' ke World App
-      const result = await mk.send("world_id");
+      const mk = new MiniKit({
+        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID, // pastikan env sudah ada!
+      });
+      // Ganti 'send' dengan method terbaru, misal 'open'
+      const result = await mk.open(); // atau .connect(), cek docs!
       if (result) {
         onSuccess(result);
       }
