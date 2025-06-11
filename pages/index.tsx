@@ -25,7 +25,7 @@ export default function Home() {
           </p>
           <IDKitWidget
             app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-            action="login"
+            action="log-in"
             onSuccess={(result: ISuccessResult) => {
               setNullifierHash(result.nullifier_hash);
             }}
