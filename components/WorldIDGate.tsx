@@ -1,32 +1,28 @@
-import { useState } from "react";
-import WorldIDLoginButton from "@/components/WorldIDLoginButton";
+"use client";
+import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import { useRouter } from "next/navigation";
 
-interface WorldIDGateProps {
-  onSuccess: (verification: any, isOrb: boolean) => void;
-}
-
-export default function WorldIDGate({ onSuccess }: WorldIDGateProps) {
-  const [loading, setLoading] = useState(false);
+export default function WorldIDLoginButton() {
+  const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="bg-white rounded-lg shadow p-8">
-        <div className="flex items-center space-x-2 mb-4">
-          <span className="text-3xl">🌐</span>
-          <span className="text-2xl font-bold">World Reward Coin</span>
-        </div>
-        <p className="mb-4 text-center">
-          Silakan login dengan <b>World ID</b> untuk melanjutkan.
-        </p>
-        <WorldIDLoginButton
-          onSuccess={(result) => {
-            setLoading(true);
-            // Cek hasil response wallet-auth, jika tidak ada verification_level ganti dengan field lain
-            // Sementara gunakan nullifier_hash saja
-            onSuccess(result, false); // Atau deteksi sesuai field terbaru
-          }}
-        />
-      </div>
-    </div>
+    <IDKitWidget
+      app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
+      action="login"
+      onSuccess={(result: ISuccessResult) => {
+        // result sudah mengandung nullifier_hash dsb, bisa kamu proses jika perlu
+        router.push("/dashboard"); // Ganti "/dashboard" dengan path dashboard-mu
+      }}
+    >
+      {({ open }) => (
+        <button
+          className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
+          onClick={open}
+          type="button"
+        >
+          Connect with World ID
+        </button>
+      )}
+    </IDKitWidget>
   );
 }

@@ -1,25 +1,28 @@
 "use client";
-import { MiniKit } from "@worldcoin/minikit-js";
+import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import { useRouter } from "next/navigation";
 
-export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
-  const handleLogin = async () => {
-    try {
-      const mk = new MiniKit();
-      const result = await mk.start(); // ← INI YANG BENAR
-      if (result) {
-        onSuccess(result);
-      }
-    } catch (e) {
-      alert("Login dibatalkan atau gagal.");
-    }
-  };
+export default function WorldIDLoginButton() {
+  const router = useRouter();
 
   return (
-    <button
-      className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
-      onClick={handleLogin}
+    <IDKitWidget
+      app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
+      action="log-in"
+      onSuccess={(result: ISuccessResult) => {
+        // result sudah mengandung nullifier_hash dsb, bisa kamu proses jika perlu
+        router.push("/dashboard"); // Ganti "/dashboard" dengan path dashboard-mu
+      }}
     >
-      Connect with World ID
-    </button>
+      {({ open }) => (
+        <button
+          className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
+          onClick={open}
+          type="button"
+        >
+          Connect with World ID
+        </button>
+      )}
+    </IDKitWidget>
   );
 }
