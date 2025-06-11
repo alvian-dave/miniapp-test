@@ -5,7 +5,7 @@ export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: 
   const handleLogin = async () => {
     try {
       const mk = new MiniKit();
-      const result = await mk.connect();
+      const result = await mk.start(); // ← INI YANG BENAR
       if (result) {
         onSuccess(result);
       }
