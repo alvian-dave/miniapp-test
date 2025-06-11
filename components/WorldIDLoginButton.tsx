@@ -1,14 +1,14 @@
 "use client";
-import { MiniKitWorldID } from "@worldcoin/minikit-js";
+import { MiniKit } from "@worldcoin/minikit-js";
 
 export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: any) => void }) {
   const handleLogin = async () => {
     try {
-      const worldID = new MiniKitWorldID({
-        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID!, // pakai env kamu
-        action: "login", // atau sesuai kebutuhan
+      const mk = new MiniKit({
+        app_id: process.env.NEXT_PUBLIC_WORLDID_APP_ID!,
+        action: "log-in",
       });
-      const result = await worldID.verify();
+      const result = await mk.worldID.connect();
       if (result) {
         onSuccess(result);
       }
@@ -18,11 +18,11 @@ export default function WorldIDLoginButton({ onSuccess }: { onSuccess: (result: 
   };
 
   return (
-    <Button
+    <button
       className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
       onClick={handleLogin}
     >
       Connect with World ID
-    </Button>
+    </button>
   );
 }
