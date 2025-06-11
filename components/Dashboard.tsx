@@ -118,16 +118,16 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               <span>🪙</span> CLAIM
             </h2>
             <p className="text-base sm:text-lg flex items-center gap-2">
-              💼 Saldo Wallet: <span className="font-mono text-black">{balance.toFixed(6)}</span> WRC
+              💼 Wallet Balance: <span className="font-mono text-black">{balance.toFixed(6)}</span> WRC
             </p>
             <p className="text-base sm:text-lg flex items-center gap-2">
-              🎁 Klaim Tersedia: <span className="font-mono text-green-600">{claimable.toFixed(6)}</span> WRC
+              🎁 Available to claim: <span className="font-mono text-green-600">{claimable.toFixed(6)}</span> WRC
             </p>
             <Button
               className="w-full bg-teal-500 hover:bg-teal-600 text-white text-sm sm:text-base rounded-lg py-2 mt-2 font-bold"
               onClick={claim}
             >
-              Claim Sekarang
+              Claim now
             </Button>
           </div>
         </div>
@@ -139,12 +139,12 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               <span>💰</span> STAKING
             </h2>
             <p className="text-base sm:text-lg flex items-center gap-2">
-              📥 Total Staking: <span className="font-mono text-black">{stakeAmount.toFixed(6)}</span> WRC
+              📥 Staking Balance: <span className="font-mono text-black">{stakeAmount.toFixed(6)}</span> WRC
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <input
                 className="bg-gray-100 text-black border-gray-300 focus:ring-teal-500 flex-1 rounded-lg px-3 py-2"
-                placeholder="Jumlah yang ingin di-stake"
+                placeholder="Enter the amount you want to stake"
                 value={stakeInput}
                 onChange={handleStakeInputChange}
               />
@@ -173,7 +173,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               <span>🎉</span> REWARD
             </h2>
             <p className="text-base sm:text-lg flex items-center gap-2">
-              💹 Reward Staking: <span className="font-mono text-yellow-600">{reward.toFixed(6)}</span> WRC
+              💹 Staking Reward: <span className="font-mono text-yellow-600">{reward.toFixed(6)}</span> WRC
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <Button

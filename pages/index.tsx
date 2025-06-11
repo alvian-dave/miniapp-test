@@ -21,7 +21,7 @@ export default function Home() {
             World Reward Coin
           </h1>
           <p className="text-center text-gray-600 mb-5 text-sm">
-            Hubungkan World ID kamu untuk masuk ke dashboard MiniApp.
+            Connect your World ID to claim reward.
           </p>
           <IDKitWidget
             app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
