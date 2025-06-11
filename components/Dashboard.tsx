@@ -161,7 +161,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               onClick={unstake}
               disabled={stakeAmount === 0}
             >
-              Tarik Semua
+              Unstake All
             </Button>
           </div>
         </div>
