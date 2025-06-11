@@ -1,28 +1,22 @@
 export type UserData = {
-  wallet: number
-  claimable: number
-  staking: number
-  stakingReward: number
-  reward: number
-  lastUpdate: number
-  loginAt: number
+  nullifierHash: string;
+  isOrb: boolean;
+  mainReward: number;
+  stakingBalance: number;
+  stakingReward: number;
+  lastUpdatedAt: number; // unix timestamp (ms)
+  walletBalance: number; // saldo wallet utama
+};
+
+const STORAGE_KEY = "worldcoin-user";
+
+export function getUserData(nullifierHash: string): UserData | null {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(`${STORAGE_KEY}:${nullifierHash}`);
+  return raw ? JSON.parse(raw) as UserData : null;
 }
 
-export function getUserIdFromProof(proof: any): string {
-  // nullifier_hash adalah ID unik World ID user
-  return proof?.nullifier_hash || ''
-}
-
-export function loadUserData(userId: string): UserData | null {
-  if (!userId) return null
-  if (typeof window === "undefined") return null
-  const raw = localStorage.getItem('user-' + userId)
-  if (!raw) return null
-  return JSON.parse(raw)
-}
-
-export function saveUserData(userId: string, data: UserData) {
-  if (!userId) return
-  if (typeof window === "undefined") return
-  localStorage.setItem('user-' + userId, JSON.stringify(data))
+export function setUserData(data: UserData) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(`${STORAGE_KEY}:${data.nullifierHash}`, JSON.stringify(data));
 }

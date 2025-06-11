@@ -1,0 +1,9 @@
+{
+  "0x104844a9f64a74426ba3c72faafb1651e16852d56a5970a901262ab392bb77b8": {
+    "nullifierHash": "0x104844a9f64a74426ba3c72faafb1651e16852d56a5970a901262ab392bb77b8",
+    "isOrb": false,
+    "reward": 0.0013680000000000003,
+    "lastUpdatedAt": 1749639991138,
+    "balance": 0.005952
+  }
+}

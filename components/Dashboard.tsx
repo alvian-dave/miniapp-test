@@ -17,16 +17,14 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
   const [loadingStake, setLoadingStake] = useState(false);
 
   useEffect(() => {
-    const fetchStatus = () => {
-      axios.get(`/api/claim/status/${nullifierHash}`).then(res => setClaimable(res.data.claimable));
-      axios.get(`/api/stake/reward/${nullifierHash}`).then(res => setReward(res.data.reward));
-      axios.get(`/api/user/wallet/${nullifierHash}`).then(res => setBalance(res.data.balance));
-      axios.get(`/api/stake/total/${nullifierHash}`).then(res => setStakeAmount(res.data.total_stake));
-    };
-    const interval = setInterval(fetchStatus, 1000);
-    fetchStatus();
-    return () => clearInterval(interval);
-  }, [nullifierHash]);
+  const fetchStatus = () => {
+    axios.get(`/api/claim/status/${nullifierHash}`)
+      .then(res => setClaimable(res.data.claimable));
+  };
+  const interval = setInterval(fetchStatus, 1000);
+  fetchStatus();
+  return () => clearInterval(interval);
+}, [nullifierHash]);
 
   const claim = async () => {
     const res = await axios.post('/api/claim/execute', { nullifier_hash: nullifierHash });
