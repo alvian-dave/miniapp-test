@@ -1,13 +1,23 @@
-import mongoose from "mongoose";
-const UserSchema = new mongoose.Schema({
-  worldId: { type: String, unique: true, required: true },
-  walletAddress: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  lastLogin: { type: Date, default: Date.now },
+import mongoose, { Schema, Document, Model } from "mongoose";
+
+export interface IUser extends Document {
+  worldId: string;
+  // walletAddress dihapus/opsional
+  mainReward: number;
+  lastClaimUpdate: Date;
+  stakeAmount: number;
+  stakingReward: number;
+  stakeStart: Date;
+}
+
+const UserSchema = new Schema<IUser>({
+  worldId: { type: String, required: true, unique: true },
+  // walletAddress dihapus
   mainReward: { type: Number, default: 0 },
+  lastClaimUpdate: { type: Date, default: Date.now },
+  stakeAmount: { type: Number, default: 0 },
   stakingReward: { type: Number, default: 0 },
   stakeStart: { type: Date, default: Date.now },
-  autoLogin: { type: Boolean, default: false },
-  onChainBalance: { type: String, default: "0" }
 });
-export default mongoose.models.User || mongoose.model("User", UserSchema);
+
+export default (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>("User", UserSchema);
