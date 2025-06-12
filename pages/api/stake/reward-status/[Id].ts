@@ -4,8 +4,8 @@ import User from "@/models/User";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect();
-  const { worldId } = req.query;
-  const user = await User.findOne({ worldId });
+  const { id } = req.query; // Ambil dari param URL
+  const user = await User.findOne({ worldId: id }); // Cari dengan worldId = id
   if (!user) return res.status(404).json({ error: "User not found" });
 
   const apy = 0.7;

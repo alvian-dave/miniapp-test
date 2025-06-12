@@ -6,8 +6,8 @@ import { ethers } from "ethers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect();
-  const { worldId } = req.query;
-  const user = await User.findOne({ worldId });
+  const { id } = req.query; // gunakan param 'id' sesuai dynamic route
+  const user = await User.findOne({ worldId: id }); // cocokkan dengan field worldId di DB
   if (!user) return res.status(404).json({ error: "User not found" });
 
   let balance = "0";

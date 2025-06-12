@@ -7,8 +7,10 @@ const CLAIM_RATE = 0.000001;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect();
-  const { worldId } = req.query;
-  const user = await User.findOne({ worldId });
+  const { id } = req.query; // <<=== ini yang benar
+
+  // Cari user dengan field worldId === id
+  const user = await User.findOne({ worldId: id });
   if (!user) return res.status(404).json({ error: "User not found" });
 
   const now = Date.now();
