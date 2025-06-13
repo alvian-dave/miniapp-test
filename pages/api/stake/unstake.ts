@@ -1,23 +1,23 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { dbConnect } from "@/lib/mongo";
-import User from "@/models/User";
-import { getErc20Contract } from "@/lib/erc20";
+import { NextApiRequest, NextApiResponse } from "next";
 import { ethers } from "ethers";
+import contractABI from "../../abi/WorldAppDashboard.json";
+
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS as string;
+const RPC_URL = process.env.RPC_URL as string;
+const PRIVATE_KEY = process.env.PRIVATE_KEY as string;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await dbConnect();
-  const { nullifier_hash, amount } = req.body;
-  const user = await User.findOne({ worldId: nullifier_hash });
-  if (!user) return res.status(404).json({ error: "User not found" });
-  if ((user.stakeAmount ?? 0) < amount || amount <= 0) return res.status(400).json({ error: "Invalid unstake amount" });
-
-  // Transfer dari pool ke wallet user
+  if (req.method !== "POST") return res.status(405).end();
   try {
-    // Demo: update DB saja
-    user.stakeAmount = (user.stakeAmount ?? 0) - amount;
-    await user.save();
-    res.status(200).json({ success: true });
+    const { nullifier_hash } = req.body;
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+
+    const tx = await contract.unstakeAll(nullifier_hash);
+    await tx.wait();
+    res.json({ success: true, txHash: tx.hash });
   } catch (e: any) {
-    res.status(500).json({ error: "Unstake failed", detail: e.message });
+    res.status(500).json({ error: e.message });
   }
 }

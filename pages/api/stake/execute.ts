@@ -1,33 +1,23 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { dbConnect } from "@/lib/mongo";
-import User from "@/models/User";
-import { getErc20Contract } from "@/lib/erc20";
+import { NextApiRequest, NextApiResponse } from "next";
 import { ethers } from "ethers";
+import contractABI from "../../abi/WorldAppDashboard.json";
+
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS as string;
+const RPC_URL = process.env.RPC_URL as string;
+const PRIVATE_KEY = process.env.PRIVATE_KEY as string;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await dbConnect();
-  const { nullifier_hash, amount } = req.body;
-  const user = await User.findOne({ worldId: nullifier_hash });
-  if (!user) return res.status(404).json({ error: "User not found" });
-  if (amount <= 0) return res.status(400).json({ error: "Invalid amount" });
-
-  // Cek saldo wallet
-  const contract = getErc20Contract();
-  const decimals = await contract.decimals();
-  const balance = await contract.balanceOf(user.walletAddress);
-  const balanceNum = parseFloat(ethers.formatUnits(balance, decimals));
-  if (balanceNum < amount) return res.status(400).json({ error: "Insufficient wallet balance" });
-
-  // Transfer dari wallet user ke wallet owner (staking pool)
-  const poolAddress = process.env.STAKING_POOL_ADDRESS!;
+  if (req.method !== "POST") return res.status(405).end();
   try {
-    // Di sini asumsikan user sudah approve/allowance, atau gunakan signature, dsb.
-    // Demo: langsung update DB
-    user.stakeAmount = (user.stakeAmount ?? 0) + amount;
-    user.stakeStart = new Date();
-    await user.save();
-    res.status(200).json({ success: true });
+    const { nullifier_hash, amount } = req.body;
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+
+    const tx = await contract.stake(nullifier_hash, ethers.parseUnits(amount, 18));
+    await tx.wait();
+    res.json({ success: true, txHash: tx.hash });
   } catch (e: any) {
-    res.status(500).json({ error: "Stake failed", detail: e.message });
+    res.status(500).json({ error: e.message });
   }
 }
