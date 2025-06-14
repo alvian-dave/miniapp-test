@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import contract from '@/lib/contract';
+import { getClaimable } from '@/lib/contract';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { nullifierHash } = req.query;
