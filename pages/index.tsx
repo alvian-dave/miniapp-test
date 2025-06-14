@@ -10,12 +10,13 @@ export default function Home() {
   const handleLogin = async (result: ISuccessResult) => {
     setLoading(true);
     try {
+      console.log("✅ Login result:", result);
       const res = await fetch("/api/user/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           worldIdHash: result.nullifier_hash,
-          wallet: result.nullifier_hash, // wallet dikirim dari World App (signal)
+          wallet: result.nullifier_hash, // gunakan hash sebagai wallet dummy
         }),
       });
 
@@ -44,7 +45,7 @@ export default function Home() {
           <IDKitWidget
             app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
             action="log-in"
-            signal="wallet" // Otomatis ambil dari World App
+            signal="placeholder" // bisa tetap isi dummy karena tidak dipakai
             onSuccess={handleLogin}
           >
             {({ open }) => (
