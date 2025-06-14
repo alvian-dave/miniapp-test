@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { dashboardReadContract } from "@/lib/contract";
+import { isUserRegistered } from "@/lib/contract";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const wallet = await dashboardReadContract.withdrawWallet(nullifierHash);
+    const wallet = await isUserRegistered(nullifierHash);
     res.status(200).json({ wallet });
   } catch (e: any) {
     console.error("Error in is-registered API:", e);

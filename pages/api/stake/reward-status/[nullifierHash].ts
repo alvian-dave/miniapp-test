@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import contract from '@/lib/contract';
+import { getPendingReward } from '@/lib/contract';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { nullifierHash } = req.query;
@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const stakeReward = await contract.getPendingReward(nullifierHash);
+    const stakeReward = await getPendingReward(nullifierHash);
     return res.status(200).json({ stakeReward });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch staking reward' });
