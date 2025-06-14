@@ -27,7 +27,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           worldIdHash: result.nullifier_hash,
-          signal: walletAddress, // signal sebagai wallet
+          signal: undefined, // signal sebagai wallet
         }),
       });
 
