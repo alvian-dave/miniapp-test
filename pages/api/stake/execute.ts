@@ -1,23 +1,22 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { stakeWithWorldID } from "@/lib/contract";
 import { ethers } from "ethers";
-import contractABI from "../../abi/WorldAppDashboard.json";
-
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS as string;
-const RPC_URL = process.env.RPC_URL as string;
-const PRIVATE_KEY = process.env.PRIVATE_KEY as string;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).end();
-  try {
-    const { nullifier_hash, amount } = req.body;
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-    const tx = await contract.stake(nullifier_hash, ethers.parseUnits(amount, 18));
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
+  try {
+    const { signal, root, nullifierHash, proof, worldIdHash, amount } = req.body;
+
+    if (!signal || !root || !nullifierHash || !proof || !worldIdHash || !amount) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const parsedAmount = ethers.utils.parseUnits(amount.toString(), 18);
+    const tx = await stakeWithWorldID(signal, root, nullifierHash, proof, worldIdHash, parsedAmount);
+
+    return res.status(200).json({ success: true, txHash: tx.transactionHash });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Stake failed" });
   }
 }

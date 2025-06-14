@@ -1,17 +1,35 @@
 import { useState } from "react";
-import Dashboard from "@/components/Dashboard";
+import { useRouter } from "next/router";
 import { Card, CardContent } from "@/components/ui/card";
 import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
 
 export default function Home() {
-  const [nullifierHash, setNullifierHash] = useState<string | null>(null);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  if (nullifierHash) {
-    // Setelah login, tampilkan dashboard
-    return <Dashboard nullifierHash={nullifierHash} />;
-  }
+  const handleLogin = async (result: ISuccessResult) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/user/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          worldIdHash: result.nullifier_hash,
+          wallet: result.nullifier_hash, // wallet dikirim dari World App (signal)
+        }),
+      });
 
-  // Sebelum login, tampilkan UI login
+      if (!res.ok) throw new Error("Init failed");
+
+      router.push(`/dashboard?nullifier=${result.nullifier_hash}`);
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-cyan-200 via-blue-100 to-indigo-200 px-2">
       <Card className="rounded-2xl shadow-xl p-8 max-w-xs w-full flex flex-col items-center">
@@ -26,17 +44,17 @@ export default function Home() {
           <IDKitWidget
             app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
             action="log-in"
-            onSuccess={(result: ISuccessResult) => {
-              setNullifierHash(result.nullifier_hash);
-            }}
+            signal="wallet" // Otomatis ambil dari World App
+            onSuccess={handleLogin}
           >
             {({ open }) => (
               <button
                 className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
                 onClick={open}
                 type="button"
+                disabled={loading}
               >
-                Connect with World ID
+                {loading ? "Loading..." : "Connect with World ID"}
               </button>
             )}
           </IDKitWidget>

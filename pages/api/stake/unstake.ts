@@ -1,23 +1,19 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { ethers } from "ethers";
-import contractABI from "../../abi/WorldAppDashboard.json";
-
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS as string;
-const RPC_URL = process.env.RPC_URL as string;
-const PRIVATE_KEY = process.env.PRIVATE_KEY as string;
+import type { NextApiRequest, NextApiResponse } from "next";
+import { unstakeAll } from "@/lib/contract";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
   try {
     const { nullifier_hash } = req.body;
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
 
-    const tx = await contract.unstakeAll(nullifier_hash);
-    await tx.wait();
-    res.json({ success: true, txHash: tx.hash });
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
+    if (!nullifier_hash) {
+      return res.status(400).json({ error: "Missing nullifier_hash" });
+    }
+
+    const tx = await unstakeAll(nullifier_hash);
+    return res.status(200).json({ success: true, txHash: tx.transactionHash });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Unstake failed" });
   }
 }
