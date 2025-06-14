@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getWithdrawWallet } from "@/lib/contract"; // sesuai dengan letak aslimu
+import { getWallet } from "@/lib/contract"; // sesuai dengan letak aslimu
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { nullifierHash } = req.query;
@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const wallet = await getWithdrawWallet(nullifierHash);
+    const wallet = await getWallet(nullifierHash);
 
     const isRegistered =
       wallet && wallet.toLowerCase() !== "0x0000000000000000000000000000000000000000";
