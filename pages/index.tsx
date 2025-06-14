@@ -13,7 +13,7 @@ export default function Home() {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
         action: "log-in", // sama seperti di IDKitWidget sebelumnya
         verification_level: VerificationLevel.Orb,
-        signal: undifiend, // optional, bisa pakai string statik
+        signal: undefined, // optional, bisa pakai string statik
       });
 
       if (finalPayload.status === "error") {
