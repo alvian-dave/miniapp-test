@@ -84,7 +84,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
 
   const six = (n: number) => (n ?? 0).toFixed(6);
 
-  const post = async (url: string, data?: object, key: keyof typeof loading) => {
+  const post = async (url: string, key: keyof typeof loading, data?: object) => {
     setLoading(l => ({ ...l, [key]: true }));
     try {
       await axios.post(url, { nullifier_hash: nullifierHash, ...data });
@@ -106,7 +106,7 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
             <h2 className="text-xl font-semibold text-teal-700">🏛️ CLAIM</h2>
             <p>💼 Wallet Balance: <span className="font-mono">{six(walletBalance)} WRC</span></p>
             <p>🎁 Claimable: <span className="font-mono text-green-600">{six(claimable)} WRC</span></p>
-            <Button onClick={() => post('/api/claim/execute', {}, 'claim')} disabled={loading.claim || claimable <= 0}>
+            <Button onClick={() => post('/api/claim/execute', 'claim')} disabled={loading.claim || claimable <= 0}>
               {loading.claim ? 'Processing...' : 'Claim'}
             </Button>
           </CardContent>
@@ -120,11 +120,11 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
               const val = e.target.value;
               if (/^\d*\.?\d*$/.test(val)) setStakeInput(val);
             }} placeholder="Stake amount" />
-            <Button onClick={() => post('/api/stake/execute', { amount: parseFloat(stakeInput) }, 'stake')}
+            <Button onClick={() => post('/api/stake/execute', 'stake', { amount: parseFloat(stakeInput) })}
               disabled={loading.stake || !stakeInput || parseFloat(stakeInput) <= 0}>
               {loading.stake ? "Staking..." : "Stake"}
             </Button>
-            <Button onClick={() => post('/api/stake/unstake', { amount: stakingBalance }, 'unstake')} disabled={loading.unstake || stakingBalance <= 0}>
+            <Button onClick={() => post('/api/stake/unstake', 'unstake', { amount: stakingBalance })} disabled={loading.unstake || stakingBalance <= 0}>
               {loading.unstake ? "Unstaking..." : "Unstake All"}
             </Button>
           </CardContent>
@@ -134,10 +134,10 @@ export default function Dashboard({ nullifierHash }: DashboardProps) {
           <CardContent className="space-y-3 p-4">
             <h2 className="text-xl font-semibold text-purple-600">🎉 REWARD</h2>
             <p>💹 Reward: <span className="font-mono">{six(stakingReward)} WRC</span></p>
-            <Button onClick={() => post('/api/stake/compound', { worldId: nullifierHash }, 'compound')} disabled={loading.compound || stakingReward <= 0}>
+            <Button onClick={() => post('/api/stake/compound', 'compound', { worldId: nullifierHash })} disabled={loading.compound || stakingReward <= 0}>
               {loading.compound ? "Processing..." : "Compound"}
             </Button>
-            <Button onClick={() => post('/api/stake/claim-reward', { worldId: nullifierHash }, 'reward')} disabled={loading.reward || stakingReward <= 0}>
+            <Button onClick={() => post('/api/stake/claim-reward', 'reward', { worldId: nullifierHash })} disabled={loading.reward || stakingReward <= 0}>
               {loading.reward ? "Processing..." : "Claim Reward"}
             </Button>
           </CardContent>
