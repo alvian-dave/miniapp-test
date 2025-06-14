@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getWallet } from '@/lib/contract';
+import { getWallet, getBalance } from '@/lib/contract';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { nullifierHash } = req.query;
@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const wallet = await getWallet(nullifierHash);
-    const balance = await contract.getBalance(wallet);
+    const balance = await getBalance(wallet);
     return res.status(200).json({ wallet, balance });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch wallet info' });
