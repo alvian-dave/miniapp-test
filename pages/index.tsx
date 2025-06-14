@@ -1,7 +1,12 @@
+// pages/index.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Card, CardContent } from "@/components/ui/card";
-import { MiniKit, VerificationLevel, ISuccessResult } from "@worldcoin/minikit-js";
+import {
+  MiniKit,
+  VerificationLevel,
+  ISuccessResult,
+} from "@worldcoin/minikit-js";
 
 export default function Home() {
   const router = useRouter();
@@ -11,9 +16,9 @@ export default function Home() {
     setLoading(true);
     try {
       const { finalPayload } = await MiniKit.commandsAsync.verify({
-        action: "log-in", // sama seperti di IDKitWidget sebelumnya
+        action: "log-in",
         verification_level: VerificationLevel.Orb,
-        signal: undefined, // optional, bisa pakai string statik
+        signal: "static-signal", // ✅ signal harus berupa string valid
       });
 
       if (finalPayload.status === "error") {
@@ -27,12 +32,13 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           worldIdHash: result.nullifier_hash,
-          signal: undefined, // signal sebagai wallet
+          signal: "static-signal", // samakan dengan signal saat verify
         }),
       });
 
       if (!res.ok) throw new Error("Init failed");
 
+      // ✅ Arahkan ke dashboard
       router.push(`/dashboard?nullifier=${result.nullifier_hash}`);
     } catch (error) {
       console.error("Login error:", error);
