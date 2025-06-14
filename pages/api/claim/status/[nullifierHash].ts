@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const claimable = await contract.getClaimable(nullifierHash);
+    const claimable = await getClaimable(nullifierHash);
     return res.status(200).json({ claimable });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch claimable amount' });
