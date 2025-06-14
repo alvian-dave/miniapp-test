@@ -1,22 +1,33 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Card, CardContent } from "@/components/ui/card";
-import { IDKitWidget, ISuccessResult } from "@worldcoin/idkit";
+import { MiniKit, VerificationLevel, ISuccessResult } from "@worldcoin/minikit-js";
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (result: ISuccessResult) => {
+  const handleLogin = async () => {
     setLoading(true);
     try {
-      console.log("✅ Login result:", result);
+      const { finalPayload } = await MiniKit.commandsAsync.verify({
+        action: "log-in", // sama seperti di IDKitWidget sebelumnya
+        verification_level: VerificationLevel.Orb,
+        signal: walletAddress, // optional, bisa pakai string statik
+      });
+
+      if (finalPayload.status === "error") {
+        throw new Error("Verification rejected");
+      }
+
+      const result = finalPayload as ISuccessResult;
+
       const res = await fetch("/api/user/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           worldIdHash: result.nullifier_hash,
-          wallet: result.nullifier_hash, // gunakan hash sebagai wallet dummy
+          signal: walletAddress, // signal sebagai wallet
         }),
       });
 
@@ -42,23 +53,13 @@ export default function Home() {
           <p className="text-center text-gray-600 mb-5 text-sm">
             Connect your World ID to claim reward.
           </p>
-          <IDKitWidget
-            app_id={process.env.NEXT_PUBLIC_WORLDID_APP_ID!}
-            action="log-in"
-            signal="placeholder" // bisa tetap isi dummy karena tidak dipakai
-            onSuccess={handleLogin}
+          <button
+            className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
+            onClick={handleLogin}
+            disabled={loading}
           >
-            {({ open }) => (
-              <button
-                className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow text-lg transition"
-                onClick={open}
-                type="button"
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Connect with World ID"}
-              </button>
-            )}
-          </IDKitWidget>
+            {loading ? "Loading..." : "Connect with World ID"}
+          </button>
         </CardContent>
       </Card>
       <div className="text-xs text-gray-400 mt-8">
